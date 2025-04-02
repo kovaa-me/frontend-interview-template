@@ -4,8 +4,9 @@
 
 .layout {
   min-height: 100vh;
-  background-image: url("assets/background.jpg");
+  background-color: #3c42c4;
 }
+
 .branding {
   display: flex;
   width: fit-content;

@@ -4,7 +4,7 @@
 /*  details are not important here */
 /* ========================================== */
 
-import type { Item } from "../types";
+import type { RawItem, ItemId } from "../types";
 import { getRandomEmoji } from "./getRandomEmoji";
 const SAMPLE_TEXTS = [
   "Delgough Highland",
@@ -45,9 +45,9 @@ const SAMPLE_TEXTS = [
 ];
 
 // change for uuid
-let id = 0;
+let uuid = 0;
 
-export const getRandomItems = (): Array<Item> => {
+export const getRandomItems = (id: ItemId): Array<RawItem> => {
   const randomItemsCount = Math.floor(Math.random() * 3) + 2;
   const result = [];
 
@@ -56,7 +56,12 @@ export const getRandomItems = (): Array<Item> => {
     const randomTitle = SAMPLE_TEXTS[randomTitleIndex];
     const randomEmoji = getRandomEmoji();
 
-    result.push({ title: randomTitle, id: String(id++), emoji: randomEmoji });
+    result.push({
+      title: randomTitle,
+      id: String(uuid++),
+      emoji: randomEmoji,
+      parent: id,
+    });
   }
 
   return result;

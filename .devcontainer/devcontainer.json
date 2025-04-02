@@ -9,7 +9,11 @@
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
           "source.fixAll": "explicit"
-        }
+        },
+        "editor.tabSize": 2,
+        "files.trimTrailingWhitespace": true,
+        "typescript.preferences.importModuleSpecifier": "non-relative",
+        "javascript.preferences.importModuleSpecifier": "non-relative"
       }
     }
   }

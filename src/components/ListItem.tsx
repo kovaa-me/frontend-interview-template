@@ -1,52 +1,62 @@
 import React, { useCallback, useEffect, useState } from "react";
+
 // here you can add styles
 import "./ListItem.css";
 // here is the ts type of the data
-import { Item } from "../types";
+import { ItemId } from "../types";
 // here are the icons if you need them
-import { getDocumentChildItems, GetItemsParams } from "~/actions/getItems";
-import useResolver from "~/hooks/useResolver";
-import { MapCache } from "~/resolvers/cacheImpl";
 
 import { Icon } from "./Icon/Icon";
+import useResolveItems from "~/hooks/useResolveItems";
+import { useItemsStore } from "~/store/useItemsStore";
 
-// saving the state of open menu items
-const itemsCache = new MapCache<boolean>();
 interface Props {
-  item: Item;
+  id: ItemId;
 }
 
-export const ListItem = ({ item }: Props) => {
+// TODO: подписка на состояние резолвера, чтобы новые данные не прокидвать по дереву, а доставать по месту (звучит как глобальный стейт)
+// TODO: стейтменеджер
+// TODO: дедупликация запросов
+// TODO: реализация levelov кеша (level?: Level,key ?: string, expiration ?: number)
+// TODO: husky
+// TODO: тесты, jest testing library
+// TODO: useCache?
+// TODO: storybook?
+// TODO: ssr? а как? айдишники рандомные
+// TODO: роутинг? а как? айдишники рандомные
+// TODO: деплой
+// FIXME: убрать лишние перерисовки
+
+// DONE: ошибка не попадает в тайминг
+
+export const ListItem = ({ id }: Props) => {
+  const { selectItem, setItem } = useItemsStore((state) => state);
   const [hasHover, setHasHover] = useState(false);
-  const [showIconError, setIconError] = useState(false);
+  const [hasIconError, setHasIconError] = useState(false);
   const [animateIcon, setAnimateIcon] = useState(false);
-  const [isOpen, setIsOpen] = useState(itemsCache.get(item.id) || false);
-  const { refetch, isLoading, data, error } = useResolveItems({
-    id: item.id,
-    title: item.title,
-  });
+  const { isOpen, isLoading, error, title, emoji, childrens } = selectItem(id);
+  const { refetch } = useResolveItems({ id, title: title });
 
   const clickHandler = useCallback(() => {
     if (error) {
       // set open state for further data display
-      setIsOpen(true);
+      setItem(id, { isOpen: true });
       refetch();
       return;
     }
 
     const currentState = !isOpen;
-    setIsOpen(currentState);
+    setItem(id, { isOpen: currentState });
   }, [error, isOpen]);
 
   // awaits for data flow
   useEffect(() => {
-    if (!isOpen || !data) {
+    if (!isOpen || !childrens) {
       return;
     }
 
-    setIconError(false);
-    itemsCache.set(item.id, true);
-  }, [data, isOpen]);
+    setHasIconError(false);
+  }, [childrens, isOpen]);
 
   // awaits for error flow
   useEffect(() => {
@@ -54,7 +64,7 @@ export const ListItem = ({ item }: Props) => {
       return;
     }
 
-    setIconError(true);
+    setHasIconError(true);
     setAnimateIcon(true);
   }, [error, isOpen]);
 
@@ -82,33 +92,18 @@ export const ListItem = ({ item }: Props) => {
         <Icon
           isLoading={isLoading}
           isOpen={isOpen}
-          emoji={item.emoji}
-          hasError={showIconError}
+          emoji={emoji}
+          hasError={hasIconError}
           hasHover={hasHover}
           onAnimationEnd={onIconAnimationEnd}
           animate={animateIcon}
         />
-        <div className="title">{item.title}</div>
+        <div className="title">{title}</div>
       </button>
 
       <div className="items">
-        {isOpen
-          ? data?.map((item) => <ListItem item={item} key={item.id} />)
-          : null}
+        {isOpen ? childrens?.map((id) => <ListItem id={id} key={id} />) : null}
       </div>
     </>
   );
-};
-
-
-type FetchResult = Item[];
-
-type ResolverParams = GetItemsParams & { title: string };
-
-const useResolveItems = ({ id, title }: ResolverParams) => {
-  return useResolver<GetItemsParams, FetchResult>(getDocumentChildItems, {
-    requestParams: { id },
-    queryParams: { prefetch: true },
-    cacheOptions: { key: `${id}_${title}` },
-  });
 };

@@ -1,4 +1,4 @@
-import { Item } from "~/types";
+import { RawItem } from "~/types";
 import { fakeFetch } from "../utils/fakeFetch";
 import { getRandomItems } from "../utils/getRandomItems";
 
@@ -13,11 +13,17 @@ let requestCount = 0;
 
 export type GetItemsParams = { id: string };
 
-export const getDocumentChildItems = ({ id }: GetItemsParams): Promise<Item[]> => {
+export const getDocumentChildItems = ({
+  id,
+}: GetItemsParams): Promise<RawItem[]> => {
   if (++requestCount > MAX_REQUEST_COUNT) {
     console.log(">>> Possible infinite loop detected!");
     throw new Error("Possible infinite loop");
   }
 
-  return fakeFetch(getRandomItems, `getChildItems for item ${id}`, true);
+  return fakeFetch(
+    () => getRandomItems(id),
+    `getChildItems for item ${id}`,
+    true,
+  );
 };

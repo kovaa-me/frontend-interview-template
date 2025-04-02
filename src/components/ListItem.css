@@ -42,7 +42,7 @@ button {
 }
 
 .item:hover .title {
-  border-color:rgb(0 0 0 / 35%);
+  border-color: rgb(0 0 0 / 35%);
 }
 
 .items {

@@ -5,6 +5,8 @@ import resolverImpl, {
   ResolverParams,
 } from "~/resolvers/resolverImpl";
 
+import { useItemsStore } from "~/store/useItemsStore";
+
 type Return<Result> = {
   isLoading: boolean;
   data: Result | undefined;
@@ -36,6 +38,8 @@ const useResolver = <Params extends ResolverParams, Result>(
     setNeedFetch(true);
   };
 
+  const { setItemsState, setParents, setItem } = useItemsStore((state) => state);
+
   useEffect(() => {
     if (!needFetch) {
       return;
@@ -49,6 +53,15 @@ const useResolver = <Params extends ResolverParams, Result>(
         requestParams: params,
         cacheOptions,
       });
+
+      if (error) {
+        setItem(params.id, { error })
+      }
+
+      if (result) {
+        setItemsState(result);
+        setParents(result)
+      }
 
       setData(result);
       setError(error);

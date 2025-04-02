@@ -5,16 +5,16 @@
 /* ========================================== */
 const getRandomDelay = (min: number, max: number) => {
   return Math.random() * (max - min) + min;
-}
+};
 
 const getRandomError = (probability: number) => {
-  return (Math.random() < probability);
-}
+  return Math.random() < probability;
+};
 
 export const fakeFetch = <ReturnType>(
   callback: () => ReturnType,
   resource: string,
-  withFakeError?: boolean
+  withFakeError?: boolean,
 ): Promise<ReturnType> => {
   const start = Date.now();
   console.log(`>>> called - ${resource}`);
@@ -30,7 +30,11 @@ export const fakeFetch = <ReturnType>(
 
       resolve(result);
 
-      console.log(`>>> completed - ${resource}`, { result }, `for ${Date.now() - start}ms`);
+      console.log(
+        `>>> completed - ${resource}`,
+        { result },
+        `for ${Date.now() - start}ms`,
+      );
     }, randomDelayMs);
   });
 };

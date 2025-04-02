@@ -31,6 +31,11 @@ export const Icon = ({
   const size = error ? 13 : 15;
   const color = error ? "#fff" : "#000";
 
+  // closed
+  // loading
+  // error
+  // open
+
   if (hasHover || (isLoading && isOpen) || hasError) {
     return (
       <div

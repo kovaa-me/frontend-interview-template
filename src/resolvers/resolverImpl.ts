@@ -47,16 +47,20 @@ const resolverImpl = async <Params extends ResolverParams, Result>(
     result = await resolver(requestParams);
     cache.set(key, result);
   } catch (e) {
-    let message
+    let message;
     if (typeof e === "string") {
       message = e;
       error = new Error(e);
     } else if (e instanceof Error) {
-      message = e.message
+      message = e.message;
       error = new Error(e.message);
     }
 
-    console.error(`Resolver ${resolver.name} failed with message "${message}"`, { requestParams }, { error: e });
+    console.error(
+      `Resolver ${resolver.name} failed with message "${message}"`,
+      { requestParams },
+      { error: e },
+    );
   }
 
   return { result, error };
